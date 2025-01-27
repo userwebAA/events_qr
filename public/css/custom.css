@@ -1,0 +1,289 @@
+:root {
+    --e5-red: #FF0000;
+    --e5-black: #000000;
+    --e5-gradient: linear-gradient(135deg, var(--e5-red), var(--e5-black));
+    --neon-shadow: 0 0 10px rgba(255, 0, 0, 0.2), 0 0 20px rgba(255, 0, 0, 0.1);
+}
+
+.e5-gradient {
+    background: var(--e5-gradient);
+}
+
+.e5-button {
+    background-color: #dc2626;
+    color: white;
+    font-weight: 500;
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.e5-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.e5-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.e5-progress-bar {
+    background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+    transition: width 0.6s ease-in-out;
+    height: 4px;
+    border-radius: 2px;
+    box-shadow: var(--neon-shadow);
+}
+
+.e5-logo {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 1.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.3s ease;
+    transform: translateY(0);
+    filter: drop-shadow(0 4px 6px rgba(220, 38, 38, 0.1));
+}
+
+.e5-logo:hover {
+    transform: translateY(-5px);
+    filter: drop-shadow(0 10px 15px rgba(220, 38, 38, 0.2));
+}
+
+.question-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2rem;
+}
+
+.question-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--neon-shadow);
+}
+
+.radio-button {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--e5-red);
+    border-radius: 50%;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.radio-button:checked {
+    background-color: var(--e5-red);
+    box-shadow: var(--neon-shadow);
+}
+
+.radio-button:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.textarea-custom {
+    width: 100%;
+    min-height: 150px;
+    border: 2px solid rgba(255, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    resize: vertical;
+}
+
+.textarea-custom:focus {
+    outline: none;
+    border-color: var(--e5-red);
+    box-shadow: var(--neon-shadow);
+}
+
+.progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.bg-pattern {
+    background-image: 
+        linear-gradient(45deg, rgba(255, 0, 0, 0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 0, 0, 0.05) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 0, 0, 0.05) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 0, 0, 0.05) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* Animation pour les messages de succès */
+@keyframes slideIn {
+    from {
+        transform: translateX(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.bg-green-100 {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Style pour le tableau */
+.divide-y > tr {
+    transition: background-color 0.2s ease;
+}
+
+/* Style pour la pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.pagination > * {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.pagination > *:hover {
+    background-color: #f3f4f6;
+}
+
+.pagination > .active {
+    background-color: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+/* Style pour les cartes de statistiques */
+.bg-white {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bg-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive design improvements */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .e5-button {
+        width: 100%;
+    }
+    
+    .px-6 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .quiz-container {
+        padding: 1rem;
+    }
+
+    .question-card {
+        padding: 1rem;
+    }
+
+    .textarea-custom {
+        min-height: 100px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Base styles améliorés */
+.table-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 0.75rem;
+}
+
+.table-responsive {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.stats-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.textarea-custom {
+    width: 100%;
+    min-height: 150px;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    resize: vertical;
+    transition: border-color 0.2s ease;
+}
+
+.textarea-custom:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Progress bar responsive */
+.progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    z-index: 1000;
+}
+
+/* Amélioration des marges et paddings responsives */
+.container {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Support des grands écrans */
+@media (min-width: 1536px) {
+    .quiz-container {
+        max-width: 1400px;
+    }
+}
