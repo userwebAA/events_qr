@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import 'animations.css';
+
+/* Personnalisation des boutons radio */
+input[type="radio"] {
+    @apply appearance-none rounded-full w-4 h-4 border-2 border-red-600 mr-2 relative top-0.5;
+}
+
+input[type="radio"]:checked {
+    @apply bg-red-600 border-red-600;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+input[type="radio"]:focus {
+    @apply outline-none;
+}

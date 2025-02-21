@@ -6,21 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
         Schema::table('responses', function (Blueprint $table) {
-            $table->text('user_response')->after('id');
-            $table->dropColumn('answers');
-            $table->dropColumn('feedback');
+            $table->string('selected_option')->nullable()->change();
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::table('responses', function (Blueprint $table) {
-            $table->dropColumn('user_response');
-            $table->jsonb('answers')->nullable();
-            $table->text('feedback')->nullable();
+            $table->string('selected_option')->nullable(false)->change();
         });
     }
 };

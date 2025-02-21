@@ -13,16 +13,19 @@
     background-color: #dc2626;
     color: white;
     font-weight: 500;
-    transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
 }
 
 .e5-button:hover {
+    background-color: #b91c1c;
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.e5-button:disabled {
+    background-color: #f87171;
+    cursor: not-allowed;
 }
 
 .e5-button:active {
@@ -31,9 +34,12 @@
 }
 
 .e5-progress-bar {
+    height: 100%;
+    background-color: #dc2626;
+    width: 0;
+    transition: width 0.3s ease;
     background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
     transition: width 0.6s ease-in-out;
-    height: 4px;
     border-radius: 2px;
     box-shadow: var(--neon-shadow);
 }
@@ -70,33 +76,38 @@
     box-shadow: var(--neon-shadow);
 }
 
-.radio-button {
+input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--e5-red);
     border-radius: 50%;
-    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #dc2626;
+    margin-right: 8px;
     position: relative;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    top: 2px;
 }
 
-.radio-button:checked {
-    background-color: var(--e5-red);
-    box-shadow: var(--neon-shadow);
+input[type="radio"]:checked {
+    border-color: #dc2626;
+    background-color: transparent;
 }
 
-.radio-button:checked::after {
+input[type="radio"]:checked::before {
     content: '';
     position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #dc2626;
+    border-radius: 50%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 8px;
-    height: 8px;
-    background-color: white;
-    border-radius: 50%;
+}
+
+input[type="radio"]:focus {
+    outline: none;
 }
 
 .textarea-custom {
@@ -117,10 +128,12 @@
 }
 
 .progress-container {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.2);
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
     z-index: 1000;
 }
 

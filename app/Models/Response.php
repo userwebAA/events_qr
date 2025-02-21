@@ -3,22 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Question;
 
 class Response extends Model
 {
-    protected $fillable = ['answers', 'feedback'];
-
-    protected $casts = [
-        'answers' => 'json'
+    protected $fillable = [
+        'question_id',
+        'selected_option',
+        'table_id',
+        'feedback'
     ];
 
-    public function setAnswersAttribute($value)
-    {
-        $this->attributes['answers'] = is_string($value) ? $value : json_encode($value);
-    }
+    protected $casts = [
+        'question_id' => 'integer'
+    ];
 
-    public function getAnswersAttribute($value)
+    public function question()
     {
-        return json_decode($value, true);
+        return $this->belongsTo(Question::class)
+                    ->where('id', '>=', 0); // Exclure l'ID -1 de la relation
     }
 }

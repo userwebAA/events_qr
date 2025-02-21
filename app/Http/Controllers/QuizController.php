@@ -4,73 +4,92 @@ namespace App\Http\Controllers;
 
 use App\Models\Question;
 use App\Models\Response;
+use App\Models\ResponseHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class QuizController extends Controller
 {
-    public function show()
+    public function showQr()
     {
-        $questions = Question::orderBy('id')->get();
-        
-        if ($questions->isEmpty()) {
-            Log::warning('Aucune question trouvée dans la base de données');
-            return redirect()->route('home')->with('error', 'Le questionnaire n\'est pas disponible pour le moment.');
-        }
+        $url = route('quiz.show');
+        $qrCode = QrCode::size(300)
+                        ->backgroundColor(255, 255, 255)
+                        ->color(0, 0, 0)
+                        ->margin(2)
+                        ->generate($url);
 
-        return view('quiz.show', compact('questions'));
+        return view('quiz.qr', compact('qrCode'));
+    }
+
+    public function show($tableId = null)
+    {
+        $questions = Question::orderBy('order', 'asc')->get();
+        return view('quiz.show', compact('questions', 'tableId'));
     }
 
     public function submit(Request $request)
     {
         try {
-            Log::info('Données reçues:', $request->json()->all());
-            
-            // Récupérer les données JSON
             $data = $request->json()->all();
-            $answers = $data['answers'] ?? null;
-            $feedback = $data['feedback'] ?? '';
-            
-            // Validation des données
-            if (!is_array($answers) || empty($answers)) {
+            Log::info('Données reçues:', $data);
+
+            if (!isset($data['answers']) || !is_array($data['answers'])) {
                 throw new \Exception('Format de réponses invalide');
             }
 
-            // Vérification que toutes les réponses correspondent à des questions existantes
-            $questions = Question::pluck('id')->toArray();
-            foreach ($answers as $questionId => $answer) {
-                if (!in_array((int)$questionId, $questions)) {
-                    throw new \Exception('Question invalide détectée');
-                }
-                if (!is_numeric($answer)) {
-                    throw new \Exception('Format de réponse invalide');
-                }
-                // Convertir les réponses en entiers
-                $answers[$questionId] = (int)$answer;
+            $answers = $data['answers'];
+            $feedback = $data['feedback'] ?? '';
+            $tableId = $data['tableId'] ?? null;
+
+            DB::beginTransaction();
+
+            foreach ($answers as $questionId => $selectedOption) {
+                // Créer la réponse normale
+                $response = Response::create([
+                    'question_id' => $questionId,
+                    'selected_option' => $selectedOption,
+                    'table_id' => $tableId,
+                    'feedback' => $feedback
+                ]);
+
+                // Sauvegarder dans l'historique
+                ResponseHistory::create([
+                    'question_id' => $questionId,
+                    'selected_option' => $selectedOption,
+                    'table_id' => $tableId,
+                    'feedback' => $feedback
+                ]);
+
+                Log::info('Réponse enregistrée:', [
+                    'question_id' => $questionId,
+                    'selected_option' => $selectedOption,
+                    'table_id' => $tableId
+                ]);
             }
 
-            // Sauvegarder les réponses
-            $response = Response::create([
-                'answers' => json_encode($answers),
-                'feedback' => $feedback
-            ]);
-
-            Log::info('Réponse créée avec succès:', ['id' => $response->id]);
+            DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Réponses enregistrées avec succès',
-                'redirect' => route('quiz.thank-you')
+                'redirect' => route('thank-you')
             ]);
             
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la soumission du questionnaire: ' . $e->getMessage());
+            DB::rollBack();
+            
+            Log::error('Erreur lors de la soumission:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Une erreur est survenue lors de l\'enregistrement de vos réponses: ' . $e->getMessage()
-            ], 422);
+                'message' => 'Une erreur est survenue : ' . $e->getMessage()
+            ], 500);
         }
     }
 

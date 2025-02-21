@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\Question;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $qrcode = QrCode::size(300)->generate(route('quiz.show'));
-        return view('home', compact('qrcode'));
+        $questions = Question::orderBy('order')->get();
+        return view('welcome', compact('questions'));
     }
 }

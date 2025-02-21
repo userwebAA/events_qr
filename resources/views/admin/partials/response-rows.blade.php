@@ -1,29 +1,42 @@
-@foreach($responses as $response)
-    <tr class="hover:bg-gray-50 transition-colors">
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-            {{ $response->created_at->format('d/m/Y H:i') }}
+@forelse($responses as $response)
+    <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4">
+            <span class="text-sm text-gray-900">Table {{ $response->table_id }}</span>
+        </td>
+        <td class="px-6 py-4">
+            <span class="text-sm text-gray-500">
+                {{ \Carbon\Carbon::parse($response->created_at)->format('d/m/Y H:i') }}
+            </span>
         </td>
         @foreach($questions as $question)
-            @if(isset($response->answers[$question->id]) && $response->answers[$question->id] !== null && $response->answers[$question->id] !== '')
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                    {{ $question->options[$response->answers[$question->id]] ?? 'Réponse invalide' }}
-                </td>
-            @endif
+            <td class="px-6 py-4">
+                @php
+                    $responseKey = $response->table_id . '_' . $response->created_at;
+                    $answers = isset($responseDetails[$responseKey]) ? $responseDetails[$responseKey] : collect();
+                    $answer = $answers->firstWhere('question_id', $question->id);
+                @endphp
+                <span class="text-sm text-red-600">
+                    {{ $answer ? $answer->selected_option : '-' }}
+                </span>
+            </td>
         @endforeach
-        <td class="px-6 py-4 text-sm text-gray-800 max-w-[200px]">
-            @if($response->feedback)
-                <div class="flex items-center gap-2">
-                    <div class="truncate">{{ Str::limit($response->feedback, 30) }}</div>
-                    @if(strlen($response->feedback) > 30)
-                        <button onclick="alert('{{ $response->feedback }}')"
-                                class="shrink-0 text-red-600 hover:text-red-700 transition-colors">
-                            <span class="material-icons" style="font-size: 20px;">visibility</span>
-                        </button>
-                    @endif
-                </div>
-            @else
-                <span class="text-gray-400">-</span>
-            @endif
+        <td class="px-6 py-4">
+            <span class="text-sm text-gray-500">
+                @php
+                    $responseKey = $response->table_id . '_' . $response->created_at;
+                @endphp
+                @if(isset($feedbacks[$responseKey]))
+                    {{ $feedbacks[$responseKey]->first()->feedback }}
+                @else
+                    -
+                @endif
+            </span>
         </td>
     </tr>
-@endforeach
+@empty
+    <tr>
+        <td colspan="{{ count($questions) + 3 }}" class="px-6 py-4 text-center text-gray-500">
+            Aucune réponse enregistrée
+        </td>
+    </tr>
+@endforelse
