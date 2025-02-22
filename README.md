@@ -17,15 +17,21 @@ Ce guide détaille les étapes nécessaires pour déployer l'application QR Even
 
 ```bash
 # Installation des dépendances système (Ubuntu/Debian)
- - php >=8.1-pgsql php8.1-mbstring php8.1-xml php8.1-curl php8.1-zip
- - postgresql postgresql-contrib nginx
+ - php >=8.1-pgsql 
+ - mbstring 
+ - xml 
+ - curl 
+ - zip
+ - postgresql
+ - postgresql-contrib
+ - nginx ou apache2
 ```
 
 ### 2. Configuration du Projet
 
 1. Cloner le repository :
 ```bash
-git clone [URL_DU_REPO]
+git clone [https://github.com/userwebAA/events_qr.git]
 cd events_qr
 ```
 
@@ -46,7 +52,7 @@ php artisan key:generate
 ```
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://votre-domaine.com
+APP_URL=https://quiz.eventsfive.com
 
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
@@ -65,19 +71,14 @@ php artisan view:cache
 
 ### 3. Base de Données
 
-1. Créer l'utilisateur et la base de données PostgreSQL :
-```bash
-sudo -u postgres psql
-CREATE USER votre_utilisateur WITH PASSWORD 'votre_mot_de_passe';
-CREATE DATABASE qrcode_quiz;
-GRANT ALL PRIVILEGES ON DATABASE qrcode_quiz TO votre_utilisateur;
-\q
-```
 
-2. Importer la base de données existante :
+1. Importer la base de données existante :
 ```bash
 # Se placer à la racine du projet où se trouve le fichier SQL
-sudo -u postgres psql qrcode_quiz < qrcode_quiz.sql
+sudo -u postgres psql qrcode_quiz < pg_dump.sql 
+ou 
+sudo -u postgres psql qrcode_quiz < mysql_dump.sql 
+
 ```
 
 ### 4. Configuration du Serveur Web (Nginx)
@@ -156,7 +157,6 @@ php artisan up
 ## Sécurité
 
 - Assurez-vous que tous les mots de passe sont sécurisés
-- Activez le pare-feu (UFW)
 - Configurez les sauvegardes automatiques de la base de données PostgreSQL :
 ```bash
 # Créer un script de backup
