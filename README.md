@@ -1,66 +1,169 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Guide de Déploiement - Application QR Events
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Ce guide détaille les étapes nécessaires pour déployer l'application QR Events en production.
 
-## About Laravel
+## Prérequis
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.1 ou supérieur
+- Composer
+- Node.js et NPM
+- PostgreSQL 14 ou supérieur
+- Serveur web (Apache/Nginx)
+- SSL/TLS pour HTTPS
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Étapes de Déploiement
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Préparation du Serveur
 
-## Learning Laravel
+```bash
+# Installation des dépendances système (Ubuntu/Debian)
+ - php >=8.1-pgsql php8.1-mbstring php8.1-xml php8.1-curl php8.1-zip
+ - postgresql postgresql-contrib nginx
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2. Configuration du Projet
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Cloner le repository :
+```bash
+git clone [URL_DU_REPO]
+cd events_qr
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Installer les dépendances :
+```bash
+composer install --optimize-autoloader --no-dev
+npm install
+npm run build
+```
 
-## Laravel Sponsors
+3. Configuration de l'environnement :
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. Configurer le fichier `.env` :
+```
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://votre-domaine.com
 
-### Premium Partners
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=qrcode_quiz
+DB_USERNAME=votre_utilisateur
+DB_PASSWORD=votre_mot_de_passe
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+5. Optimiser Laravel :
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
 
-## Contributing
+### 3. Base de Données
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Créer l'utilisateur et la base de données PostgreSQL :
+```bash
+sudo -u postgres psql
+CREATE USER votre_utilisateur WITH PASSWORD 'votre_mot_de_passe';
+CREATE DATABASE qrcode_quiz;
+GRANT ALL PRIVILEGES ON DATABASE qrcode_quiz TO votre_utilisateur;
+\q
+```
 
-## Code of Conduct
+2. Importer la base de données existante :
+```bash
+# Se placer à la racine du projet où se trouve le fichier SQL
+sudo -u postgres psql qrcode_quiz < qrcode_quiz.sql
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Configuration du Serveur Web (Nginx)
 
-## Security Vulnerabilities
+Créer une configuration Nginx :
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```nginx
+server {
+    listen 80;
+    server_name votre-domaine.com;
+    root /chemin/vers/events_qr/public;
 
-## License
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    index index.php;
+
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+
+### 5. SSL/TLS (Let's Encrypt)
+
+```bash
+apt install certbot python3-certbot-nginx
+certbot --nginx -d votre-domaine.com
+```
+
+### 6. Permissions
+
+```bash
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+```
+
+### 7. Maintenance et Surveillance
+
+- Configurer la surveillance des logs :
+```bash
+tail -f storage/logs/laravel.log
+```
+
+- Pour les mises à jour futures :
+```bash
+php artisan down
+git pull
+composer install --optimize-autoloader --no-dev
+npm install
+npm run build
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan up
+```
+
+## Sécurité
+
+- Assurez-vous que tous les mots de passe sont sécurisés
+- Activez le pare-feu (UFW)
+- Configurez les sauvegardes automatiques de la base de données PostgreSQL :
+```bash
+# Créer un script de backup
+pg_dump -U votre_utilisateur qrcode_quiz > backup_$(date +%Y%m%d).sql
+```
+- Maintenez le système à jour
+
+## Support
+
+En cas de problème lors du déploiement, consultez les logs dans `storage/logs/laravel.log`.
